@@ -36,6 +36,7 @@ class ExternalImageProcessor
 
                 if (self::hostMatches($host, $internalHosts)) {
                     $image->data->set('external', false);
+
                     continue;
                 }
 
@@ -57,7 +58,7 @@ class ExternalImageProcessor
 
     private static function hostMatches(string $host, $compareTo)
     {
-        if (str_starts_with($host, '/')) {
+        if (Str::startsWith($host, '/')) {
             return true;
         }
 
@@ -66,7 +67,7 @@ class ExternalImageProcessor
                 $c = Str::before($c, ':');
             }
 
-            if (strncmp($c, '/', 1) === 0) {
+            if (Str::startsWith($c, '/')) {
                 if (preg_match($c, $host)) {
                     return true;
                 }

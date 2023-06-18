@@ -178,7 +178,8 @@ class ThemeController extends Controller
             $config = $this->validate($request, $this->files->getRequire($rulesPath));
 
             if ($request->has('append')) {
-                $config = array_merge($this->themes->readConfig($theme), $config);
+                $currentConfig = $this->themes->readConfig($theme);
+                $config = static::appendConfig($currentConfig, $config);
             }
 
             $this->themes->updateConfig($theme, $config);
@@ -214,5 +215,16 @@ class ThemeController extends Controller
 
         return redirect()->route('admin.themes.index')
             ->with('success', trans('admin.themes.updated'));
+    }
+
+    protected static function appendConfig(array $config, array $replacement)
+    {
+        foreach ($replacement as $key => $value) {
+            $config[$key] = is_array($value)
+                ? static::appendConfig($config[$key], $value)
+                : $value;
+        }
+
+        return $config;
     }
 }

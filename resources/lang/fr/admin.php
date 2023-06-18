@@ -110,6 +110,8 @@ return [
             'money' => 'Nom de la monnaie du site',
             'copyright' => 'Copyright',
             'user_money_transfer' => 'Activer le transfert de d\'argent entre les utilisateurs',
+            'webhook' => 'URL du webhook Discord pour les articles',
+            'webhook_info' => 'Un webhook Discord sera envoyé sur cette URL lors de la création d\'un nouvel article, si la date de publication n\'est pas dans le futur. Laisser vide pour désactiver.',
             'site_key' => 'Clé de site pour azuriom.com',
             'site_key_info' => 'La clé de site d\'azuriom.com est utilisée pour installer les extensions payantes achetées sur le market. Elle peut être obtenue dans votre <a href="https://market.azuriom.com/profile" target="_blank" rel="noopener norefferer">profil Azuriom</a>.',
         ],
@@ -123,6 +125,7 @@ return [
                 'secret_key' => 'Clé secrète',
                 'recaptcha' => 'Vous pouvez obtenir les clés Google reCaptcha sur le site de <a href="https://www.google.com/recaptcha/" target="_blank" rel="noopener noreferrer">Google reCaptcha</a>. Vous devez utiliser des clés reCaptcha <strong>v2 invisible</strong>.',
                 'hcaptcha' => 'Vous pouvez obtenir les clés hCaptcha sur le site de <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer">hCaptcha</a>.',
+                'turnstile' => 'Vous pouvez obtenir les clés Turnstile sur le <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" rel="noopener noreferrer">tableau de bord Cloudflare</a>. Vous devez sélectionner le widget "Géré".',
             ],
 
             'hash' => 'Algorithme de hachage',
@@ -179,7 +182,8 @@ return [
             'registration_info' => 'Il sera toujours possible de s\'enregistrer par exemple avec des plugins.',
             'api' => 'Activer l\'API auth',
             'api_info' => 'Cette API vous permet d\'ajouter une authentification personnalisée à votre serveur de jeu. Pour les serveurs Minecraft utilisant un launcher vous pouvez utiliser <a href="https://github.com/Azuriom/AzAuth" target="_blank" rel="noopener noreferrer">AzAuth</a> pour une intégration simple et rapide.',
-            'user_delete' => 'Autoriser les utilisateurs à supprimer leur compte depuis le profil',
+            'user_change_name' => 'Permettre aux utilisateurs de changer leur pseudo depuis le profil.',
+            'user_delete' => 'Permettre aux utilisateurs de supprimer leur compte depuis le profil',
         ],
 
         'mail' => [
@@ -270,13 +274,13 @@ return [
         'azlink' => [
             'port' => 'Port AzLink',
 
-            'link' => 'Pour lier votre serveur Minecraft à votre site Web en utilisant AzLink vous devez:',
+            'link' => 'Pour lier votre serveur à votre site Web en utilisant AzLink vous devez:',
             'link1' => '<a href="https://azuriom.com/azlink">Télécharger le plugin AzLink</a> et l\'installer sur votre serveur.',
             'link2' => 'Redémarrer votre serveur.',
             'link3' => 'Exécuter cette commande sur votre serveur: ',
 
             'info' => 'Si vous avez des problèmes avec AzLink en utilisant Cloudflare ou un pare-feu, essayez de suivre les étapes indiquées dans la <a href="https://azuriom.com/docs/faq" target="_blank" rel="noopener norefferer">FAQ</a>.',
-            'command' => 'Vous pouvez lier votre serveur Minecraft à votre site web avec la commande: ',
+            'command' => 'Vous pouvez lier votre serveur à votre site web avec la commande: ',
             'port_command' => 'Si vous utilisez un port AzLink différent que celui par défaut, vous devez le configurer avec la commande: ',
             'ping' => 'Activer les commandes instantanées (nécessite un port ouvert libre sur le serveur)',
             'ping_info' => 'Lorsque les commandes instantanées ne sont pas activées, les commandes seront exécutées avec un délai de 30 secondes à 1 minute.',
@@ -522,6 +526,9 @@ return [
 
         'clear' => 'Supprimer les anciens logs (+15 jours)',
         'cleared' => 'Les anciens logs ont été supprimés.',
+        'changes' => 'Changements',
+        'old' => 'Ancienne valeur',
+        'new' => 'Nouvelle valeur',
 
         'pages' => [
             'created' => 'Création de la page #:id',

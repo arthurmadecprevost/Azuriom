@@ -90,7 +90,7 @@ class Notification extends Model
     public function markAsRead()
     {
         if ($this->read_at === null) {
-            $this->update(['read_at' => now()]);
+            $this->update(['read_at' => $this->freshTimestamp()]);
         }
     }
 
@@ -102,7 +102,7 @@ class Notification extends Model
     public function markAsUnread()
     {
         if ($this->read_at !== null) {
-            $this->update((['read_at' => null]));
+            $this->update(['read_at' => null]);
         }
     }
 

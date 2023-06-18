@@ -4,10 +4,11 @@ namespace Azuriom\Http\Controllers\Api;
 
 use Azuriom\Games\Steam\SteamID;
 use Azuriom\Http\Controllers\Controller;
+use Azuriom\Http\Resources\ServerCollection;
 use Azuriom\Models\Role;
 use Azuriom\Models\Server;
-use Azuriom\Models\ServerCommand;
 use Azuriom\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -15,13 +16,29 @@ use Illuminate\Support\Facades\Hash;
 
 class ServerController extends Controller
 {
+    public function index()
+    {
+        $serverId = (int) setting('servers.default');
+        $servers = Server::where('home_display', true)
+            ->when($serverId, function (Builder $query) use ($serverId) {
+                $query->orWhere('id', $serverId);
+            })
+            ->get();
+
+        $servers = $servers->where('home_display', true);
+        $server = $servers->first(fn (Server $server) => $server->id === $serverId);
+
+        return new ServerCollection($servers, $server);
+    }
+
     public function status()
     {
-        return response()->noContent();
+        return response()->noContent(headers: ['AzLink-Status' => 'Success']);
     }
 
     public function fetch(Request $request)
     {
+        /** @var \Azuriom\Models\Server $server */
         $server = Server::find($request->input('server-id'));
         $uidKey = $request->json('platform.type') === 'GMOD';
         $rawPlayers = $request->json('players', []);
@@ -46,7 +63,7 @@ class ServerController extends Controller
             ->get();
 
         if (! $commands->isEmpty()) {
-            ServerCommand::whereIn('id', $commands->modelKeys())->delete();
+            $commands->toQuery()->delete();
 
             $commands = $uidKey
                 ? $this->mapCommands($commands)
@@ -109,12 +126,54 @@ class ServerController extends Controller
         return response()->noContent();
     }
 
+    public function user(User $user)
+    {
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'uid' => $user->game_id,
+            'money' => $user->money,
+        ]);
+    }
+
+    public function addMoney(Request $request, User $user)
+    {
+        return $this->editMoney($request, $user, function (float $amount) use ($user) {
+            $user->increment('money', $amount);
+        });
+    }
+
+    public function removeMoney(Request $request, User $user)
+    {
+        return $this->editMoney($request, $user, function (float $amount) use ($user) {
+            $user->decrement('money', min($amount, $user->money));
+        });
+    }
+
+    public function setMoney(Request $request, User $user)
+    {
+        return $this->editMoney($request, $user, function (float $amount) use ($user) {
+            $user->update(['money' => $amount]);
+        });
+    }
+
+    protected function editMoney(Request $request, User $user, callable $action)
+    {
+        $this->validate($request, ['amount' => 'required|numeric|min:0.01']);
+
+        $balance = $user->money;
+        $action($request->input('amount'));
+
+        return response()->json([
+            'old_balance' => $balance,
+            'new_balance' => $user->money,
+        ]);
+    }
+
     protected function mapLegacyCommands(Collection $commands)
     {
         return $commands->groupBy('user.name')
-            ->map(function (Collection $serverCommands) {
-                return $serverCommands->pluck('command');
-            });
+            ->map(fn (Collection $group) => $group->pluck('command'));
     }
 
     protected function mapCommands(Collection $commands)

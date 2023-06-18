@@ -5,7 +5,6 @@ namespace Azuriom\Models;
 use Azuriom\Games\FallbackServerBridge;
 use Azuriom\Models\Traits\Loggable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -43,6 +42,15 @@ class Server extends Model
     ];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'token',
+    ];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -76,16 +84,11 @@ class Server extends Model
     /**
      * Get the commands waiting to be dispatch on this server.
      *
-     * Currently this should only be use for servers using AzLink.
+     * Currently, this should only be use for servers using AzLink.
      */
     public function commands()
     {
         return $this->hasMany(ServerCommand::class);
-    }
-
-    protected function cpu(): Attribute
-    {
-        return Attribute::make(set: fn ($value) => $value >= 0 ? $value : null);
     }
 
     public function fullAddress()
@@ -181,6 +184,17 @@ class Server extends Model
             : 'azlink:setup '.str_replace([':', '/'], ['!', '|'], url('/'));
 
         return $base.' '.$this->token;
+    }
+
+    public function playersRecord(bool $force = false)
+    {
+        if ($force) {
+            return $this->stats()->max('players');
+        }
+
+        return Cache::remember('servers.record.'.$this->id, now()->addHour(), function () {
+            return $this->playersRecord(true);
+        });
     }
 
     public static function types()

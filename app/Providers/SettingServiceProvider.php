@@ -48,7 +48,7 @@ class SettingServiceProvider extends ServiceProvider
             }
 
             $repo->set($settings);
-        } catch (Exception $e) {
+        } catch (Exception) {
             //
         }
     }
@@ -71,11 +71,11 @@ class SettingServiceProvider extends ServiceProvider
                 $config->set('mail.from.name', $value);
                 break;
             case 'locale':
-                $this->app->setLocale($value);
+                $this->app->setLocale(str_replace('-', '_', $value));
                 break;
             case 'timezone':
                 date_default_timezone_set($value);
-            // no break
+                // no break
             case 'url':
                 $config->set('app.'.$name, $value);
                 break;
@@ -107,6 +107,7 @@ class SettingServiceProvider extends ServiceProvider
             'welcome-popup' => 'welcome_alert',
             'auth-api' => 'auth_api',
             'user_money_transfer' => 'users.money_transfer',
+            'user_change_name' => 'users.change_name',
             'shop.use-site-money' => 'shop.use_site_money',
             'shop.month-goal' => 'shop.month_goal',
         ];

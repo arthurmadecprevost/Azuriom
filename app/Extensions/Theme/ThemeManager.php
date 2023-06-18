@@ -61,7 +61,7 @@ class ThemeManager extends ExtensionManager
         view()->getFinder()->prependLocation($viewsPath);
 
         config([
-            'view.paths' => array_merge([$viewsPath], config('view.paths', [])),
+            'view.paths' => [$viewsPath, ...config('view.paths', [])],
         ]);
 
         $this->loadConfig($theme);
@@ -214,6 +214,8 @@ class ThemeManager extends ExtensionManager
         if ($this->findDescription($theme) === null) {
             return;
         }
+
+        Setting::updateSettings('themes.config.'.$theme, null);
 
         $this->files->deleteDirectory($this->publicPath('', $theme));
 

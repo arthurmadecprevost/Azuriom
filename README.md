@@ -2,9 +2,9 @@
 
 # Azuriom
 
-[![PHP CI](https://img.shields.io/github/workflow/status/Azuriom/Azuriom/PHP%20CI?style=flat-square)](https://github.com/Azuriom/Azuriom/actions)
-[![Code Quality](https://img.shields.io/scrutinizer/quality/g/Azuriom/Azuriom?style=flat-square)](https://scrutinizer-ci.com/g/Azuriom/Azuriom/)
+[![PHP CI](https://img.shields.io/github/actions/workflow/status/Azuriom/Azuriom/tests.yml?branch=master&style=flat-square)](https://github.com/Azuriom/Azuriom/actions/workflows/tests.yml)
 [![Style](https://github.styleci.io/repos/237486333/shield)](https://github.styleci.io/repos/237486333)
+[![CodeFactor](https://www.codefactor.io/repository/github/azuriom/azuriom/badge?style=flat-square)](https://www.codefactor.io/repository/github/azuriom/azuriom)
 [![Latest release](https://img.shields.io/github/v/release/Azuriom/Azuriom?style=flat-square)](http://github.com/Azuriom/Azuriom/releases)
 [![Chat](https://img.shields.io/discord/625774284823986183?color=5865f2&label=Discord&logo=discord&logoColor=fff&style=flat-square)](https://azuriom.com/discord)
 
@@ -23,7 +23,10 @@ Azuriom natively supports the following games:
 * [Counter-Strike: Global Offensive](https://blog.counter-strike.net/)
 * [Team Fortress 2](https://www.teamfortress.com/)
 
-You can implement your own game like it was done for [Flyff](https://github.com/AzuriomCommunity/Game-Flyff) or [Dofus 1.29](https://github.com/Javdu10/Game-Dofus129). You can find the how-to in [this documentation](https://azuriom.com/en/docs/games)
+You can implement your own game like it was done for [Flyff](https://github.com/AzuriomCommunity/Game-Flyff) or [Dofus 1.29](https://github.com/Javdu10/Game-Dofus129).
+
+You can find the how-to in [the documentation](https://azuriom.com/en/docs/games)
+
 ## Documentation
 
 Azuriom's documentation is available [on our website](https://azuriom.com/docs).
@@ -31,6 +34,8 @@ Azuriom's documentation is available [on our website](https://azuriom.com/docs).
 ## Installation
 
 You can find system requirements and installation guide on our [documentation](https://azuriom.com/docs/installation).
+
+You can find the documentation for launching a docker development environment at [INSTALL.md](docker/INSTALL.md)
 
 ## Community
 
@@ -42,7 +47,7 @@ Contributions are always welcome!
 
 See [the contribution guidelines](CONTRIBUTING.md) for ways to get started.
 
-Please adhere to this project's [code of conduct](CODE_OF_CONDUCT.md)`.
+Please adhere to this project's [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Translations
 

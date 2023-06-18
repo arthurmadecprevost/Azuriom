@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 
 class SteamGame extends Game
 {
-    protected const USER_INFO_URL = 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002';
+    public const USER_INFO_URL = 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002';
 
     protected string $name;
 
@@ -103,12 +103,10 @@ class SteamGame extends Game
         }
 
         return Cache::remember("users.{$user->id}.steam", now()->addMinutes(15),
-            function () use ($user, $steamKey) {
-                return Http::get(self::USER_INFO_URL, [
-                    'key' => $steamKey,
-                    'steamids' => $user->game_id,
-                ])->throw()->json('response.players.0');
-            });
+            fn () => Http::get(self::USER_INFO_URL, [
+                'key' => $steamKey,
+                'steamids' => $user->game_id,
+            ])->throw()->json('response.players.0'));
     }
 
     public function isExtensionCompatible(array $supportedGames)

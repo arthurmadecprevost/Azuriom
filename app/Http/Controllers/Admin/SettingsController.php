@@ -26,7 +26,7 @@ class SettingsController extends Controller
      *
      * @var array
      */
-    private $mailEncryptionTypes = [
+    private array $mailEncryptionTypes = [
         'tls' => 'TLS',
         'ssl' => 'SSL',
     ];
@@ -36,7 +36,7 @@ class SettingsController extends Controller
      *
      * @var array
      */
-    private $mailMailers = [
+    private array $mailMailers = [
         'smtp' => 'SMTP',
         'sendmail' => 'Sendmail',
     ];
@@ -46,7 +46,7 @@ class SettingsController extends Controller
      *
      * @var array
      */
-    private $hashAlgorithms = [
+    private array $hashAlgorithms = [
         'bcrypt' => 'Bcrypt',
         'argon' => 'Argon2i',
         'argon2id' => 'Argon2id',
@@ -107,6 +107,7 @@ class SettingsController extends Controller
             'money' => setting('money'),
             'siteKey' => setting('site-key'),
             'userMoneyTransfer' => setting('users.money_transfer'),
+            'postsWebhook' => setting('posts_webhook'),
         ]);
     }
 
@@ -133,14 +134,15 @@ class SettingsController extends Controller
             'background' => ['nullable', 'exists:images,file'],
             'money' => ['required', 'string', 'max:15'],
             'site-key' => ['nullable', 'string', 'size:50'],
+            'posts_webhook' => ['nullable', 'url'],
         ]), [
             'user_money_transfer' => $request->filled('user_money_transfer'),
             'url' => rtrim($request->input('url'), '/'), // Remove trailing end slash
         ]);
 
-        Setting::updateSettings($settings);
+        $old = Arr::except(Setting::updateSettings($settings), 'user_money_transfer');
 
-        ActionLog::log('settings.updated');
+        ActionLog::log('settings.updated')?->createEntries($old, $settings);
 
         $response = redirect()->route('admin.settings.index')
             ->with('success', trans('admin.settings.updated'));
@@ -168,7 +170,7 @@ class SettingsController extends Controller
         $hash = array_keys($this->hashAlgorithms);
 
         $this->validate($request, [
-            'captcha' => ['nullable', 'in:recaptcha,hcaptcha'],
+            'captcha' => ['nullable', 'in:recaptcha,hcaptcha,turnstile'],
             'site_key' => ['required_with:captcha', 'max:50'],
             'secret_key' => ['required_with:captcha', 'max:50'],
             'hash' => [
@@ -180,25 +182,27 @@ class SettingsController extends Controller
             ],
         ]);
 
-        Setting::updateSettings(array_merge($request->only('hash'), [
+        $settings = array_merge($request->only('hash'), [
             'admin.force_2fa' => $request->filled('force_2fa'),
-        ]));
+        ]);
 
         if ($request->filled('captcha')) {
-            Setting::updateSettings([
+            $settings = array_merge($settings, [
                 'captcha.type' => $request->input('captcha'),
                 'captcha.site_key' => $request->input('site_key'),
                 'captcha.secret_key' => $request->input('secret_key'),
             ]);
         } else {
-            Setting::updateSettings([
+            $settings = array_merge($settings, [
                 'captcha.type' => null,
                 'captcha.site_key' => null,
                 'captcha.secret_key' => null,
             ]);
         }
 
-        ActionLog::log('settings.updated');
+        $old = Setting::updateSettings($settings);
+
+        ActionLog::log('settings.updated')?->createEntries($old, $settings);
 
         return redirect()->route('admin.settings.auth')
             ->with('success', trans('admin.settings.updated'));
@@ -303,6 +307,7 @@ class SettingsController extends Controller
     {
         return view('admin.settings.authentification', [
             'conditions' => setting('conditions'),
+            'userNameChange' => setting('user.change_name'),
             'userDelete' => setting('user.delete'),
             'register' => setting('register', true),
             'authApi' => setting('auth_api', false),
@@ -321,6 +326,7 @@ class SettingsController extends Controller
         ]) + [
             'register' => $request->filled('register'),
             'auth_api' => $request->filled('auth_api'),
+            'user.change_name' => $request->filled('user_change_name'),
             'user.delete' => $request->filled('user_delete'),
         ];
 
@@ -473,7 +479,7 @@ class SettingsController extends Controller
             $hashManager = $this->app->make(HashManager::class);
 
             return $hashManager->driver($algo)->make('hello') !== null;
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }

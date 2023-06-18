@@ -17,13 +17,15 @@ class VerifyEmail extends Notification
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
-        if (static::$toMailCallback) {
+        if (static::$toMailCallback !== null) {
             return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
         }
 
         return (new MailMessage())
             ->subject(trans('auth.mail.verify.subject'))
-            ->line(trans('auth.mail.verify.line1'))
+            ->line(trans('auth.mail.verify.line1', [
+                'count' => config('auth.verification.expire', 60),
+            ]))
             ->action(trans('auth.mail.verify.action'), $verificationUrl)
             ->line(trans('auth.mail.verify.line2'));
     }
